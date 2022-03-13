@@ -1,0 +1,51 @@
+name: Rust
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - mips-unknown-linux-musl
+          - mips-unknown-linux-gnu
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: "mullvad/udp-over-tcp"
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          target: ${{ matrix.target }}
+          toolchain: nightly
+          default: true
+          override: true
+
+      - name: Install cross
+        run: cargo install cross
+
+      - name: Build ${{ matrix.target }}
+        timeout-minutes: 120
+        run: |
+          compile_target=${{ matrix.target }}
+          
+          cross build --release --target $compile_target --bins
+          
+      - name: Store packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target }}-packages
+          path: |
+            target/${{ matrix.target }}/release/udp2tcp
+            target/${{ matrix.target }}/release/tcp2udp
