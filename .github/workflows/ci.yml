@@ -42,7 +42,7 @@ jobs:
         run: |
           compile_target=${{ matrix.target }}
           
-          cross build --release --target $compile_target --bins
+          cross build --release --target $compile_target --features="structopt" --bins
           
       - name: Store packages
         uses: actions/upload-artifact@v2
