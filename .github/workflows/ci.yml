@@ -44,7 +44,7 @@ jobs:
         run: |
           compile_target=${{ matrix.target }}
           
-          cross build --release --target $compile_target --features="clap" --bins
+          cross build --release --target $compile_target --features="clap" --config profile.release.strip=\"symbols\" --bins
           
       - name: Store packages
         uses: actions/upload-artifact@v3
